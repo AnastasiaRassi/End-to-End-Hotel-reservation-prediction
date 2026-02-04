@@ -1,0 +1,13 @@
+README.md
+setup.py
+HOTEL_RES_PREDICTIONS.egg-info/PKG-INFO
+HOTEL_RES_PREDICTIONS.egg-info/SOURCES.txt
+HOTEL_RES_PREDICTIONS.egg-info/dependency_links.txt
+HOTEL_RES_PREDICTIONS.egg-info/requires.txt
+HOTEL_RES_PREDICTIONS.egg-info/top_level.txt
+config/__init__.py
+src/__init__.py
+src/custom_exception.py
+src/data_ingestion.py
+tests/test_s3_connection.py
+utils/__init__.py
