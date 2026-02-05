@@ -1,9 +1,9 @@
 from loguru import logger
 import os, yaml
-import pandas as pd
+import pandas as pd, numpy as np
 from utils.custom_exception import CustomException
 
-def load_config(file_path):
+def load_config(file_path): # To load configuration in every file easily
     try:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File is not in the given path")
@@ -18,7 +18,7 @@ def load_config(file_path):
         raise CustomException("Failed to read YAMl file" , e)
     
 
-def load_data(path):
+def load_data(path): 
     try:
         logger.info("Loading data")
         return pd.read_csv(path)

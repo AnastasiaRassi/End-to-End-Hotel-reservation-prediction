@@ -5,7 +5,7 @@ import numpy as np
 from loguru import logger
 
 from utils.custom_exception import CustomException
-from utils.general_utils import load_config, load_data
+from utils.general_utils import load_config, load_data, RareCategoryGrouper, TopNEncoder, SkewHandler
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -58,26 +58,6 @@ class DataProcessor:
         except Exception as e:
             logger.exception("Error during preprocessing")
             raise CustomException("Preprocessing failed", e)
-
-
-    def balance_data(self, df):
-        try:
-            logger.info("Applying SMOTE to training data")
-
-            X = df.drop(columns="booking_status")
-            y = df["booking_status"]
-
-            smote = SMOTE(random_state=42)
-            X_res, y_res = smote.fit_resample(X, y)
-
-            balanced_df = pd.DataFrame(X_res, columns=X.columns)
-            balanced_df["booking_status"] = y_res
-
-            return balanced_df
-
-        except Exception as e:
-            logger.exception("Error during SMOTE")
-            raise CustomException("Balancing data failed", e)
 
 
     def select_features(self, df):
