@@ -1,0 +1,5 @@
+
+Ingestion:
+  raw_data_path: "data/raw/Hotel_Reservations.csv"
+  key: "training_data/Hotel Reservations.csv"
+  bucket: "amzn-hotel-res-bucket"

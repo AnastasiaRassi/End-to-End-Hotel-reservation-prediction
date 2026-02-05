@@ -2,7 +2,6 @@ import sys
 import traceback
 from pathlib import Path
 
-
 class CustomException(Exception):
     def __init__(self, error: Exception, sys_module=None):
         super().__init__(str(error))
