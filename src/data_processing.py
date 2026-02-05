@@ -5,11 +5,13 @@ import numpy as np
 from loguru import logger
 
 from utils.custom_exception import CustomException
-from utils.general_utils import load_config, load_data, RareCategoryGrouper, TopNEncoder, SkewHandler
+from utils.general_utils import load_config, load_data
+from utils.processing_utils import RareCategoryGrouper, TopNEncoder, SkewHandler
 
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
-from imblearn.over_sampling import SMOTE
 
 
 class DataProcessor:
@@ -17,75 +19,105 @@ class DataProcessor:
         self.proc_config = config["data_processing"]
         self.ing_config = config["data_ingestion"]
 
-        self.ing_train_path = self.ing_config["raw_train_file"]
-        self.ing_test_path = self.ing_config["raw_test_file"]
+        raw_data_dir = self.ing_config["raw_data_dir"]
+        self.ing_train_path = os.path.join(raw_data_dir, "train_Hotel_Reservations.csv")
+        self.ing_test_path = os.path.join(raw_data_dir, "test_Hotel_Reservations.csv")
 
         self.proc_train_path = self.proc_config["proc_train_file"]
         self.proc_test_path = self.proc_config["proc_test_file"]
 
-        self.encoders = {} 
+        self.preprocessor = None
 
+        self.rare_cols = ["market_segment_type", "room_type_reserved"]
+        self.num_cols = self.proc_config["numerical_columns"]
+        self.skew_threshold = self.proc_config.get("skewness_threshold", 1.0)
 
-    def preprocess_data(self, df, is_train=True):
+    def _prepare_data(self, df):
+        df = df.copy()
+        df.drop(columns=["Booking_ID"], inplace=True, errors="ignore")
+        df.drop_duplicates(inplace=True)
+        return df
+
+    def _build_preprocessor(self):
+        preprocessor = ColumnTransformer(
+            [
+                (
+                    "rare_grouped",
+                    Pipeline(
+                        [
+                            ("grouper", RareCategoryGrouper(threshold=500)),
+                            (
+                                "ohe",
+                                OneHotEncoder(
+                                    drop="first",
+                                    handle_unknown="ignore",
+                                    sparse_output=False,
+                                ),
+                            ),
+                        ]
+                    ),
+                    self.rare_cols,
+                ),
+                ("meal", TopNEncoder(n=3, prefix="meal"), ["type_of_meal_plan"]),
+                ("numeric", SkewHandler(skew_threshold=self.skew_threshold), self.num_cols),
+            ]
+        )
+        return preprocessor
+
+    def _transform_features(self, X_train, X_test, y_train):
         try:
-            logger.info("Starting data preprocessing")
+            logger.info("Building and fitting ColumnTransformer preprocessor")
 
-            df = df.copy()
+            self.preprocessor = self._build_preprocessor()
 
-            df.drop(columns=["Booking_ID"], inplace=True, errors="ignore")
-            df.drop_duplicates(inplace=True)
+            self.preprocessor.fit(X_train, y_train)
 
-            cat_cols = self.proc_config["categorical_columns"]
-            num_cols = self.proc_config["numerical_columns"]
+            X_train_transformed = pd.DataFrame(self.preprocessor.transform(X_train))
+            X_test_transformed = pd.DataFrame(self.preprocessor.transform(X_test))
 
-            for col in cat_cols:
-                if is_train:
-                    encoder = LabelEncoder()
-                    df[col] = encoder.fit_transform(df[col])
-                    self.encoders[col] = encoder
-                else:
-                    df[col] = self.encoders[col].transform(df[col])
+            logger.info(
+                f"Transformed features - Train: {X_train_transformed.shape}, Test: {X_test_transformed.shape}"
+            )
 
-            logger.info("Handling skewness")
-            skew_threshold = self.proc_config["skewness_threshold"]
-            skewness = df[num_cols].skew()
-
-            for col in skewness[skewness > skew_threshold].index:
-                df[col] = np.log1p(df[col])
-
-            return df
+            return X_train_transformed, X_test_transformed
 
         except Exception as e:
-            logger.exception("Error during preprocessing")
-            raise CustomException("Preprocessing failed", e)
+            logger.exception("Error during feature transformation")
+            raise CustomException(e, sys)
 
-
-    def select_features(self, df):
+    def _select_features(self, X_train, y_train, X_test):
         try:
-            logger.info("Selecting top features")
-
-            X = df.drop(columns="booking_status")
-            y = df["booking_status"]
+            logger.info("Selecting top features using RandomForest feature importance")
 
             model = RandomForestClassifier(random_state=42)
-            model.fit(X, y)
+            model.fit(X_train, y_train)
 
-            feature_importance = pd.DataFrame({
-                "feature": X.columns,
-                "importance": model.feature_importances_,
-            }).sort_values(by="importance", ascending=False)
+            feature_names = [f"feature_{i}" for i in range(X_train.shape[1])]
+
+            feature_importance = (
+                pd.DataFrame(
+                    {
+                        "feature": feature_names,
+                        "importance": model.feature_importances_,
+                    }
+                )
+                .sort_values(by="importance", ascending=False)
+            )
 
             k = self.proc_config["no_of_top_features"]
-            selected_features = feature_importance["feature"].head(k).tolist()
+            selected_indices = feature_importance.head(k).index.tolist()
+            selected_features = feature_importance.head(k)["feature"].tolist()
 
-            logger.info(f"Selected features: {selected_features}")
+            logger.info(f"Selected top {k} features: {selected_features}")
 
-            return df[selected_features + ["booking_status"]]
+            X_train_selected = X_train.iloc[:, selected_indices]
+            X_test_selected = X_test.iloc[:, selected_indices]
+
+            return X_train_selected, X_test_selected
 
         except Exception as e:
             logger.exception("Error during feature selection")
-            raise CustomException("Feature selection failed", e)
-
+            raise CustomException(e, sys)
 
     def save_data(self, df, file_path):
         try:
@@ -95,39 +127,55 @@ class DataProcessor:
 
         except Exception as e:
             logger.exception("Error saving data")
-            raise CustomException("Saving data failed", e)
-
+            raise CustomException(e, sys)
 
     def run(self):
         try:
             logger.info("Starting data processing pipeline")
 
-            train_df = self.preprocess_data(
-                load_data(self.ing_train_path),
-                is_train=True
+            train_df = load_data(self.ing_train_path)
+            test_df = load_data(self.ing_test_path)
+
+            logger.info(f"Loaded train: {train_df.shape}, test: {test_df.shape}")
+
+            train_df = self._prepare_data(train_df)
+            test_df = self._prepare_data(test_df)
+
+            X_train = train_df.drop(columns="booking_status")
+            y_train = train_df["booking_status"]
+            X_test = test_df.drop(columns="booking_status")
+            y_test = test_df["booking_status"]
+
+            target_map = {"Not_Canceled": 0, "Canceled": 1}
+            y_train = y_train.replace(target_map)
+            y_test = y_test.replace(target_map)
+
+            X_train_transformed, X_test_transformed = self._transform_features(
+                X_train, X_test, y_train
             )
 
-            test_df = self.preprocess_data(
-                load_data(self.ing_test_path),
-                is_train=False
+            X_train_selected, X_test_selected = self._select_features(
+                X_train_transformed, y_train, X_test_transformed
             )
 
-            train_df = self.balance_data(train_df)
-            train_df = self.select_features(train_df)
+            train_processed = pd.concat(
+                [X_train_selected, pd.Series(y_train, name="booking_status")], axis=1
+            )
+            test_processed = pd.concat(
+                [X_test_selected, pd.Series(y_test, name="booking_status")], axis=1
+            )
 
-            test_df = test_df[train_df.columns]
-
-            self.save_data(train_df, self.proc_train_path)
-            self.save_data(test_df, self.proc_test_path)
+            self.save_data(train_processed, self.proc_train_path)
+            self.save_data(test_processed, self.proc_test_path)
 
             logger.success("Data processing pipeline completed")
 
         except Exception as e:
-            logger.exception("Pipeline failed")
-            raise CustomException("Data processing pipeline failed", e)
+            logger.exception("Data processing pipeline failed")
+            raise CustomException(e, sys)
 
 
 if __name__ == "__main__":
-    config = load_config("config/config.yaml")
+    config = load_config("config.yaml")
     processor = DataProcessor(config)
     processor.run()

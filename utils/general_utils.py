@@ -1,5 +1,5 @@
 from loguru import logger
-import os, yaml
+import os, yaml, sys
 import pandas as pd, numpy as np
 from utils.custom_exception import CustomException
 
@@ -15,7 +15,7 @@ def load_config(file_path): # To load configuration in every file easily
     
     except Exception as e:
         logger.error("Error while reading YAML file")
-        raise CustomException("Failed to read YAMl file" , e)
+        raise CustomException("Failed to read YAMl file" , sys)
     
 
 def load_data(path): 
@@ -24,5 +24,5 @@ def load_data(path):
         return pd.read_csv(path)
     except Exception as e:
         logger.error(f"Error loading the data {e}")
-        raise CustomException("Failed to load data" , e)
+        raise CustomException("Failed to load data" , sys)
     
