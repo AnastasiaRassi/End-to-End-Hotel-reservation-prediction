@@ -1,0 +1,105 @@
+2026-02-05 21:18:20 | INFO | Succesfully read the YAML file
+2026-02-05 21:18:20 | INFO | Using cached file: data\raw\Hotel_Reservations.csv
+2026-02-05 21:18:20 | INFO | Starting the splitting process
+2026-02-05 21:18:20 | INFO | Train data saved to data\raw\train_Hotel_Reservations.csv
+2026-02-05 21:18:20 | INFO | Test data saved to data\raw\test_Hotel_Reservations.csv
+2026-02-05 21:18:20 | INFO | Loading data into pandas
+2026-02-05 21:18:20 | SUCCESS | Loaded dataset with 36,275 rows and 19 columns
+2026-02-05 21:18:20 | INFO | Starting data processing pipeline
+2026-02-05 21:18:20 | INFO | Loading data
+2026-02-05 21:18:21 | INFO | Loading data
+2026-02-05 21:18:21 | INFO | Loaded train: (29020, 20), test: (7255, 20)
+2026-02-05 21:18:21 | INFO | Building and fitting ColumnTransformer preprocessor
+2026-02-05 21:18:21 | INFO | Fitting RareCategoryGrouper with threshold=500
+2026-02-05 21:18:21 | DEBUG | market_segment_type: rare categories = ['Complementary', 'Aviation']
+2026-02-05 21:18:21 | DEBUG | room_type_reserved: rare categories = ['Room_Type 5', 'Room_Type 7', 'Room_Type 3']
+2026-02-05 21:18:21 | INFO | Transforming data with RareCategoryGrouper
+2026-02-05 21:18:21 | DEBUG | market_segment_type: replaced 2 rare categories with 'Other_market_segment_type'
+2026-02-05 21:18:21 | DEBUG | room_type_reserved: replaced 3 rare categories with 'Other_room_type_reserved'
+2026-02-05 21:18:21 | INFO | Fitting TopNEncoder with top 3 categories
+2026-02-05 21:18:21 | DEBUG | Top categories: ['Meal Plan 1', 'Not Selected', 'Meal Plan 2']
+2026-02-05 21:18:21 | INFO | Transforming data with TopNEncoder
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Meal Plan 1' into column 'meal_meal_plan_1'
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Not Selected' into column 'meal_not_selected'
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Meal Plan 2' into column 'meal_meal_plan_2'
+2026-02-05 21:18:21 | INFO | Fitting SkewHandler with skew_threshold=5
+2026-02-05 21:18:21 | DEBUG | no_of_adults: skew=-0.341, method=none
+2026-02-05 21:18:21 | DEBUG | no_of_children: skew=4.844, method=none
+2026-02-05 21:18:21 | DEBUG | no_of_weekend_nights: skew=0.719, method=none
+2026-02-05 21:18:21 | DEBUG | no_of_week_nights: skew=1.543, method=none
+2026-02-05 21:18:21 | DEBUG | lead_time: skew=1.289, method=none
+2026-02-05 21:18:21 | DEBUG | arrival_year: skew=-1.670, method=none
+2026-02-05 21:18:21 | DEBUG | arrival_month: skew=-0.347, method=none
+2026-02-05 21:18:21 | DEBUG | arrival_date: skew=0.027, method=none
+2026-02-05 21:18:21 | DEBUG | no_of_previous_cancellations: skew=24.941, method=log
+2026-02-05 21:18:21 | DEBUG | no_of_previous_bookings_not_canceled: skew=19.510, method=log
+2026-02-05 21:18:21 | DEBUG | avg_price_per_room: skew=0.624, method=none
+2026-02-05 21:18:21 | DEBUG | no_of_special_requests: skew=1.150, method=none
+2026-02-05 21:18:21 | INFO | Transforming data with SkewHandler
+2026-02-05 21:18:21 | DEBUG | no_of_adults: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_children: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_weekend_nights: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_week_nights: applied none transform
+2026-02-05 21:18:21 | DEBUG | lead_time: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_year: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_month: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_date: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_previous_cancellations: applied log transform
+2026-02-05 21:18:21 | DEBUG | no_of_previous_bookings_not_canceled: applied log transform
+2026-02-05 21:18:21 | DEBUG | avg_price_per_room: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_special_requests: applied none transform
+2026-02-05 21:18:21 | INFO | Transforming data with RareCategoryGrouper
+2026-02-05 21:18:21 | DEBUG | market_segment_type: replaced 2 rare categories with 'Other_market_segment_type'
+2026-02-05 21:18:21 | DEBUG | room_type_reserved: replaced 3 rare categories with 'Other_room_type_reserved'
+2026-02-05 21:18:21 | INFO | Transforming data with TopNEncoder
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Meal Plan 1' into column 'meal_meal_plan_1'
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Not Selected' into column 'meal_not_selected'
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Meal Plan 2' into column 'meal_meal_plan_2'
+2026-02-05 21:18:21 | INFO | Transforming data with SkewHandler
+2026-02-05 21:18:21 | DEBUG | no_of_adults: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_children: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_weekend_nights: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_week_nights: applied none transform
+2026-02-05 21:18:21 | DEBUG | lead_time: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_year: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_month: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_date: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_previous_cancellations: applied log transform
+2026-02-05 21:18:21 | DEBUG | no_of_previous_bookings_not_canceled: applied log transform
+2026-02-05 21:18:21 | DEBUG | avg_price_per_room: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_special_requests: applied none transform
+2026-02-05 21:18:21 | INFO | Transforming data with RareCategoryGrouper
+2026-02-05 21:18:21 | DEBUG | market_segment_type: replaced 2 rare categories with 'Other_market_segment_type'
+2026-02-05 21:18:21 | DEBUG | room_type_reserved: replaced 3 rare categories with 'Other_room_type_reserved'
+2026-02-05 21:18:21 | INFO | Transforming data with TopNEncoder
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Meal Plan 1' into column 'meal_meal_plan_1'
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Not Selected' into column 'meal_not_selected'
+2026-02-05 21:18:21 | DEBUG | Encoded category 'Meal Plan 2' into column 'meal_meal_plan_2'
+2026-02-05 21:18:21 | INFO | Transforming data with SkewHandler
+2026-02-05 21:18:21 | DEBUG | no_of_adults: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_children: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_weekend_nights: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_week_nights: applied none transform
+2026-02-05 21:18:21 | DEBUG | lead_time: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_year: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_month: applied none transform
+2026-02-05 21:18:21 | DEBUG | arrival_date: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_previous_cancellations: applied log transform
+2026-02-05 21:18:21 | DEBUG | no_of_previous_bookings_not_canceled: applied log transform
+2026-02-05 21:18:21 | DEBUG | avg_price_per_room: applied none transform
+2026-02-05 21:18:21 | DEBUG | no_of_special_requests: applied none transform
+2026-02-05 21:18:21 | INFO | Transformed features - Train: (29020, 22), Test: (7255, 22)
+2026-02-05 21:18:21 | INFO | Selecting top features using RandomForest feature importance
+2026-02-05 21:18:22 | INFO | Selected top 10 features: ['feature_14', 'feature_20', 'feature_21', 'feature_17', 'feature_16', 'feature_13', 'feature_12', 'feature_1', 'feature_15', 'feature_10']
+2026-02-05 21:18:22 | SUCCESS | Saved data to data/processed/train.csv
+2026-02-05 21:18:22 | SUCCESS | Saved data to data/processed/test.csv
+2026-02-05 21:18:22 | SUCCESS | Data processing pipeline completed
+2026-02-05 21:18:22 | INFO | Loading processed train and test data for model training
+2026-02-05 21:18:22 | INFO | Loading data
+2026-02-05 21:18:23 | INFO | Loading data
+2026-02-05 21:18:23 | DEBUG | Train shape: (29020, 10), Test shape: (7255, 10)
+2026-02-05 21:18:23 | INFO | Starting Optuna hyperparameter search for RandomForest (25 trials)
+2026-02-05 21:20:09 | SUCCESS | Best RF params: {'n_estimators': 105, 'max_depth': 50, 'min_samples_split': 2, 'min_samples_leaf': 1, 'bootstrap': True}, CV accuracy=0.8984
+2026-02-05 21:20:09 | INFO | Training final RandomForest model with best parameters
+2026-02-05 21:20:13 | INFO | Test metrics ‑ Accuracy: 0.9032, Precision: 0.8782, Recall: 0.8237, F1: 0.8501
+2026-02-05 21:20:13 | SUCCESS | Saved trained model to artifacts\models\rf_01.pkl

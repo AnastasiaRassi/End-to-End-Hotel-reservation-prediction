@@ -1,0 +1,23 @@
+artifact_path: file:C:/Users/User/Documents/MLOPS_UDEMY/hotel_res/my_work/mlruns/0/models/m-d57a4d84c06744b1bf525878e83012ca/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.2
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.9.0
+model_id: m-d57a4d84c06744b1bf525878e83012ca
+model_size_bytes: 57194796
+model_uuid: m-d57a4d84c06744b1bf525878e83012ca
+prompts: null
+run_id: acadd6e200424ce1a8fcc418049fd38e
+utc_time_created: '2026-02-05 19:20:13.812765'
