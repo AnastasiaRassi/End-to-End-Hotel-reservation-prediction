@@ -1,10 +1,15 @@
 data_ingestion:
-  raw_data_path: "data/raw/Hotel_Reservations.csv" # Where the loaded S3 bucket data gets saved
+  raw_data_dir: "data/raw/" # Where the loaded S3 bucket data gets saved
+  raw_test_file: "data/processed/test.csv"
+  raw_train_file: "data/processed/train.csv"  
   bucket: "amzn-hotel-res-bucket" # which bucket data is in
   key: "training_data/Hotel Reservations.csv"  # which dir in this bucket the data is in
   train_ratio : 0.8
 
 data_processing:
+  proc_data_dir: "data/processed/"
+  proc_test_file: "data/processed/test.csv"
+  proc_train_file: "data/processed/train.csv"
   categorical_columns:
     - type_of_meal_plan
     - required_car_parking_space

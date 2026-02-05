@@ -1,7 +1,7 @@
 from loguru import logger
 import os, yaml
 import pandas as pd
-from custom_exception import CustomException
+from utils.custom_exception import CustomException
 
 def load_config(file_path):
     try:
