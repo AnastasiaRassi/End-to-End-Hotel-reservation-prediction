@@ -11,8 +11,9 @@ pipeline{
                 script{
                     echo 'Cloning github repo to jenkins.........'
                     checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'githubtoken_1', url: 'https://github.com/AnastasiaRassi/End-to-End-Hotel-reservation-prediction.git']])
-                }
+                        }
                 
+                }
             }
         stage('Setting up our virtual env and installing dependencies'){
             steps{
@@ -25,9 +26,10 @@ pipeline{
                     pip install --upgrade pip
                     pip install -e .
                     '''
-                }
+                    }
                 
-            }
+                }
+            }   
         }
     }
-}}
+}
