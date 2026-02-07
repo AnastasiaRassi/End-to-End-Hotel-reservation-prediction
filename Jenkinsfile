@@ -5,7 +5,7 @@ pipeline {
         VENV_DIR = '.venv'
         IMAGE_NAME = "jenkins-dind"
         AWS_REGION = "me-central-1"
-        ECR_REPO = "123456789012.dkr.ecr.us-east-1.amazonaws.com/hotel-res-mlops"
+        ECR_REPO = "103138678197.dkr.ecr.me-central-1.amazonaws.com/hotel-res-mlops"
     }
 
     stages {
