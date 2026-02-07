@@ -17,7 +17,7 @@ COPY . .
 RUN pip install --no-cache-dir -e .
 
 # Optional: only run during dev/testing
-RUN python pipeline/training_pipeline.py
+# RUN python pipeline/training_pipeline.py
 
 EXPOSE 5000
 CMD ["python", "application.py"]

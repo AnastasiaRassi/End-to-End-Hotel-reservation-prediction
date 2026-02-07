@@ -46,5 +46,29 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Amazon ECS') {
+            withCredentials([usernamePassword(
+                                credentialsId: 'aws-jenkins',
+                                usernameVariable: 'AWS_ACCESS_KEY_ID',
+                                passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                            )]) {
+                                script {
+                                    sh """
+                                    # Login to ECR
+                                    aws ecr get-login-password --region ${AWS_REGION} | \
+                                    docker login --username AWS --password-stdin ${ECR_REPO%/*}
+
+                                    # Build Docker image with caching
+                                    docker build --pull -t ${IMAGE_NAME}:latest .
+
+                                    # Tag for ECR
+                                    docker tag ${IMAGE_NAME}:latest ${ECR_REPO}:latest
+
+                                    # Push to ECR
+                                    docker push ${ECR_REPO}:latest
+                                    """
+                                }
+                            }
+        }
     }
 }
