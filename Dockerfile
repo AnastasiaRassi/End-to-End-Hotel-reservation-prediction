@@ -1,28 +1,23 @@
-FROM python:slim
+FROM python:3.13.5-slim
 
-# Correct ENV syntax
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Correct apt-get clean usage
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project files
-COPY . .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies
+COPY . .
 RUN pip install --no-cache-dir -e .
 
-# Optional: run training pipeline at build time
+# Optional: only run during dev/testing
 RUN python pipeline/training_pipeline.py
 
-# Expose port
 EXPOSE 5000
-
-# Default command
 CMD ["python", "application.py"]
