@@ -1,6 +1,7 @@
 <!DOCTYPE html> 
 <html lang="en">
 <head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width , initial=scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static' , filename='style.css') }}">
@@ -20,8 +21,8 @@
 
 
         <div class="form-group">
-            <label for="no_of_special_request">No_of_special_request</label>
-            <input type="number" id="no_of_special_request" name="no_of_special_request" required>
+            <label for="no_of_special_requests">No_of_special_request</label>
+            <input type="number" id="no_of_special_requests" name="no_of_special_requests" required>
         </div>
 
         <div class="form-group">
@@ -107,7 +108,7 @@
         </div>
 
         <div class="form-group">
-            <label for="type_of_meal_plan">Type_of_meal_plan</label>
+            <label for="type_of_meal_plan">Type of meal plan</label>
             <select id="type_of_meal_plan" name="type_of_meal_plan" required>
                 <option value="Meal Plan 1">Meal Plan 1</option>
                 <option value="Meal Plan 2">Meal Plan 2</option>

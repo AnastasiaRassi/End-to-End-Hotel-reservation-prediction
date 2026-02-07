@@ -1,7 +1,7 @@
 from src.data_ingestion import DataIngestion
 from src.data_processing import DataProcessor
 from src.training import ModelTraining
-from utils.processing_utils import load_config
+from utils.general_utils import load_config
 from loguru import logger
 import sys
 
@@ -14,7 +14,7 @@ logger.add(
 )
 
 logger.add(
-    'logs' / "app.log",
+    "logs/app.log",
     rotation="10 MB",
     retention="7 days",
     level="DEBUG",

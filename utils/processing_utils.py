@@ -2,11 +2,13 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import PowerTransformer
 import pandas as pd
 import numpy as np
-from utils.general_utils import CustomException
 import sys
-from loguru import logger 
+from loguru import logger
 
-class RareCategoryGrouper(BaseEstimator, TransformerMixin): 
+from utils.custom_exception import CustomException
+
+
+class RareCategoryGrouper(BaseEstimator, TransformerMixin):
     def __init__(self, threshold=500):
         self.threshold = threshold
         self.category_mappings_ = {}

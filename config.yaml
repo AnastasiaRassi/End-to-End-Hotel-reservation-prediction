@@ -10,6 +10,7 @@ data_processing:
   proc_data_dir: "data/processed/"
   proc_test_file: "data/processed/test.csv"
   proc_train_file: "data/processed/train.csv"
+  proc_artifacts_dir: "artifacts/processors/"
   categorical_columns:
     - type_of_meal_plan
     - required_car_parking_space

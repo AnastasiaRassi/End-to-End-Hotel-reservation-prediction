@@ -1,2 +1,4 @@
 .env
 .venv
+artifacts
+data/processed

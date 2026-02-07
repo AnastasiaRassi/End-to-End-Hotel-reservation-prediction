@@ -3,10 +3,11 @@ import sys
 import pandas as pd
 import numpy as np
 from loguru import logger
-
+import joblib
 from utils.custom_exception import CustomException
 from utils.general_utils import load_config, load_data
 from utils.processing_utils import RareCategoryGrouper, TopNEncoder, SkewHandler
+from pathlib import Path
 
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -25,6 +26,7 @@ class DataProcessor:
 
         self.proc_train_path = self.proc_config["proc_train_file"]
         self.proc_test_path = self.proc_config["proc_test_file"]
+        self.proc_artifacts_dir = self.proc_config["proc_artifacts_dir"]
 
         self.preprocessor = None
 
@@ -72,6 +74,14 @@ class DataProcessor:
 
             self.preprocessor.fit(X_train, y_train)
 
+            artifacts_dir = Path(self.proc_artifacts_dir)
+            artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+            joblib.dump(
+                self.preprocessor,
+                artifacts_dir / "proc_01.pkl"
+            )
+
             X_train_transformed = pd.DataFrame(self.preprocessor.transform(X_train))
             X_test_transformed = pd.DataFrame(self.preprocessor.transform(X_test))
 
@@ -113,6 +123,13 @@ class DataProcessor:
             X_train_selected = X_train.iloc[:, selected_indices]
             X_test_selected = X_test.iloc[:, selected_indices]
 
+            artifacts_dir = Path(self.proc_artifacts_dir)
+            artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+            joblib.dump(
+                selected_indices,
+                artifacts_dir / "selected_features.pkl"
+            )
             return X_train_selected, X_test_selected
 
         except Exception as e:
@@ -173,6 +190,36 @@ class DataProcessor:
         except Exception as e:
             logger.exception("Data processing pipeline failed")
             raise CustomException(e, sys)
+
+    def process_input(self, features: pd.DataFrame):
+        try:
+            logger.info("Starting inference preprocessing for user input")
+
+            assert isinstance(features, pd.DataFrame), "features must be a DataFrame"
+            assert features.shape[0] == 1, "User input must contain exactly ONE row"
+
+            # Ensure all numeric columns expected by the preprocessor exist
+            for col in self.num_cols:
+                if col not in features.columns:
+                    features[col] = 0
+
+            artifacts_dir = Path(self.proc_artifacts_dir)
+            processor = joblib.load(artifacts_dir / "proc_01.pkl")
+            selected_indices = joblib.load(artifacts_dir / "selected_features.pkl")
+
+            X_transformed = processor.transform(features)
+            X_transformed = pd.DataFrame(X_transformed)
+
+            X_selected = X_transformed.iloc[:, selected_indices]
+
+            logger.success("User input preprocessing completed successfully")
+
+            return X_selected
+
+        except Exception as e:
+            logger.exception("Inference preprocessing failed")
+            raise CustomException(e, sys)
+
 
 
 if __name__ == "__main__":
