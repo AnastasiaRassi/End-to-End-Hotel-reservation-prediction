@@ -45,7 +45,7 @@ pipeline {
                         credentialsId: 'aws-jenkins',
                         usernameVariable: 'AWS_ACCESS_KEY_ID',
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-                    )]) 
+                    )])  {
                     script {
                         sh """
                         # Login to ECR
