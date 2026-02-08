@@ -5,6 +5,7 @@ pipeline {
         IMAGE_NAME = "hotel-res-mlops"
         AWS_REGION = "me-central-1"
         ECR_REPO = "103138678197.dkr.ecr.me-central-1.amazonaws.com/hotel-res-mlops"
+        ECR_REGISTRY = "103138678197.dkr.ecr.me-central-1.amazonaws.com"
     }
 
     stages {
@@ -31,7 +32,7 @@ pipeline {
                         sh """
                         # Login to ECR
                         aws ecr get-login-password --region ${AWS_REGION} | \
-                        docker login --username AWS --password-stdin ${ECR_REPO%/*}
+                        docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
                         # Build Docker image
                         docker build --pull -t ${IMAGE_NAME}:latest .
