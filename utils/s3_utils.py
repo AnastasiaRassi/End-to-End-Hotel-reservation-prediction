@@ -16,44 +16,41 @@ class S3Progress:
         logger.info(f"Downloaded {mb:.2f} MB")
 
 
-def load_s3_model(bucket_name, model_key, local_model_path):
+def load_s3_file(bucket_name, s3_key, local_file_path):
     try:
-        logger.info(f"Checking model in S3: s3://{bucket_name}/{model_key}")
+        logger.info(f"Checking file in S3: s3://{bucket_name}/{s3_key}")
 
         s3 = boto3.client("s3")
 
-        # Check if object exists (avoids long waits + 404 later)
         try:
-            s3.head_object(Bucket=bucket_name, Key=model_key)
-            logger.info("Model found in S3")
+            s3.head_object(Bucket=bucket_name, Key=s3_key)
+            logger.info("File found in S3")
         except Exception:
             raise CustomException(
-                f"Model not found in S3 at key: {model_key}", sys
+                f"File not found in S3 at key: {s3_key}", sys
             )
 
-        local_model_path = Path(local_model_path)
-        local_model_path.parent.mkdir(parents=True, exist_ok=True)
+        local_file_path = Path(local_file_path)
+        local_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        logger.info(f"Starting download to {local_model_path}")
+        logger.info(f"Starting download to {local_file_path}")
 
-        # Download with progress
         s3.download_file(
             bucket_name,
-            model_key,
-            str(local_model_path),
+            s3_key,
+            str(local_file_path),
             Callback=S3Progress()
         )
 
-        logger.success(f"Model downloaded successfully to {local_model_path}")
+        logger.success(f"File downloaded successfully to {local_file_path}")
 
-        # Verify file size
-        if not local_model_path.exists() or local_model_path.stat().st_size == 0:
+        if not local_file_path.exists() or local_file_path.stat().st_size == 0:
             raise CustomException("Downloaded file is empty or missing", sys)
 
-        return local_model_path
+        return local_file_path
 
     except CustomException:
         raise
     except Exception as e:
-        logger.exception("Error downloading model from S3")
+        logger.exception("Error downloading file from S3")
         raise CustomException(e, sys)

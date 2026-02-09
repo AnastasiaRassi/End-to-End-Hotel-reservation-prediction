@@ -7,11 +7,9 @@ from utils.custom_exception import CustomException
 from flask import Flask, render_template, request
 from pathlib import Path
 import pandas as pd
-import boto3
-from src.data_processing import DataProcessor
 from dotenv import load_dotenv
 from loguru import logger
-from utils.s3_utils import load_s3_model
+from utils.s3_utils import load_s3_file
 
 load_dotenv()
 
@@ -21,19 +19,29 @@ try:
     logger.info("Loading configuration")
     config = load_config("config.yaml")
 
-    artifacts_dir = Path(config["data_processing"]["proc_artifacts_dir"])
-
-    logger.info("Initializing data processor")
-    processor = DataProcessor(config)
-
-    logger.info("Loading model from S3 using load_s3_model")
     bucket_name = config["training"]["bucket_name"]
+    num_cols = config["data_processing"]["numerical_columns"]
+
+    logger.info("Loading processor from S3 using load_s3_file")
+    processor_key = config["training"]["processor_key"]
+    local_processor_path = Path("artifacts/processors/proc_01.pkl")
+    local_processor_path = load_s3_file(bucket_name, processor_key, local_processor_path)
+    logger.info(f"Loading processor from disk at {local_processor_path}")
+    loaded_processor = joblib.load(local_processor_path)
+    logger.success("Processor loaded successfully")
+
+    logger.info("Loading selected features from S3 using load_s3_file")
+    selected_features_key = config["training"]["selected_features_key"]
+    local_selected_features_path = Path("artifacts/processors/selected_features.pkl")
+    local_selected_features_path = load_s3_file(bucket_name, selected_features_key, local_selected_features_path)
+    logger.info(f"Loading selected features from disk at {local_selected_features_path}")
+    selected_indices = joblib.load(local_selected_features_path)
+    logger.success("Selected features loaded successfully")
+
+    logger.info("Loading model from S3 using load_s3_file")
     model_key = config["training"]["model_key"]
-
     local_model_path = Path(config["training"]["model_output_path"])
-
-    local_model_path = load_s3_model(bucket_name, model_key, local_model_path)
-
+    local_model_path = load_s3_file(bucket_name, model_key, local_model_path)
     logger.info(f"Loading model from disk at {local_model_path}")
     loaded_model = joblib.load(local_model_path)
     logger.success("Model loaded successfully")
@@ -82,7 +90,15 @@ def index():
                 )
 
                 logger.info("Processing input features")
-                X_processed = processor.process_input(features)
+                # Ensure all numeric columns expected by the preprocessor exist
+                for col in num_cols:
+                    if col not in features.columns:
+                        features[col] = 0
+                
+                X_transformed = loaded_processor.transform(features)
+                X_transformed = pd.DataFrame(X_transformed)
+                X_processed = X_transformed.iloc[:, selected_indices]
+                logger.success("Features processed successfully")
                 
                 logger.info("Making prediction")
                 prediction = loaded_model.predict(X_processed)

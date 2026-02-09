@@ -1,5 +1,4 @@
 # These requirements have been set as of 03/02/2026, newer versions could certainly exist.
-# for data handling
 pandas>=2.2.0
 numpy>=1.26.4
 pyarrow>=14.0.2
