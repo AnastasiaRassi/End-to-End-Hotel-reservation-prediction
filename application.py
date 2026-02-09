@@ -123,3 +123,38 @@ def index():
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)
+if __name__=="__main__":
+    try:
+        logger.info("Loading configuration")
+        config = load_config("config.yaml")
+
+        bucket_name = config["training"]["bucket_name"]
+        num_cols = config["data_processing"]["numerical_columns"]
+
+        logger.info("Loading processor from S3 using load_s3_file")
+        processor_key = config["training"]["processor_key"]
+        local_processor_path = Path("artifacts/processors/proc_01.pkl")
+        local_processor_path = load_s3_file(bucket_name, processor_key, local_processor_path)
+        logger.info(f"Loading processor from disk at {local_processor_path}")
+        loaded_processor = joblib.load(local_processor_path)
+        logger.success("Processor loaded successfully")
+
+        logger.info("Loading selected features from S3 using load_s3_file")
+        selected_features_key = config["training"]["selected_features_key"]
+        local_selected_features_path = Path("artifacts/processors/selected_features.pkl")
+        local_selected_features_path = load_s3_file(bucket_name, selected_features_key, local_selected_features_path)
+        logger.info(f"Loading selected features from disk at {local_selected_features_path}")
+        selected_indices = joblib.load(local_selected_features_path)
+        logger.success("Selected features loaded successfully")
+
+        logger.info("Loading model from S3 using load_s3_file")
+        model_key = config["training"]["model_key"]
+        local_model_path = Path(config["training"]["model_output_path"])
+        local_model_path = load_s3_file(bucket_name, model_key, local_model_path)
+        logger.info(f"Loading model from disk at {local_model_path}")
+        loaded_model = joblib.load(local_model_path)
+        logger.success("Model loaded successfully")
+
+    except Exception as e:
+        logger.exception("Error during application initialization")
+        raise CustomException(e, sys)

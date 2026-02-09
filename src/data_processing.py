@@ -8,6 +8,8 @@ from utils.custom_exception import CustomException
 from utils.general_utils import load_config, load_data
 from utils.processing_utils import RareCategoryGrouper, TopNEncoder, SkewHandler
 from pathlib import Path
+from utils.s3_utils import load_s3_file
+from utils.general_utils import load_config
 
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -198,22 +200,28 @@ class DataProcessor:
             assert isinstance(features, pd.DataFrame), "features must be a DataFrame"
             assert features.shape[0] == 1, "User input must contain exactly ONE row"
 
-            # Ensure all numeric columns expected by the preprocessor exist
             for col in self.num_cols:
                 if col not in features.columns:
                     features[col] = 0
 
-            artifacts_dir = Path(self.proc_artifacts_dir)
-            processor = joblib.load(artifacts_dir / "proc_01.pkl")
-            selected_indices = joblib.load(artifacts_dir / "selected_features.pkl")
+            config = load_config("config.yaml")
+            bucket_name = config["training"]["bucket_name"]
+            
+            processor_key = config["training"]["processor_key"]
+            local_processor_path = Path("artifacts/processors/proc_01.pkl")
+            local_processor_path = load_s3_file(bucket_name, processor_key, local_processor_path)
+            processor = joblib.load(local_processor_path)
+            
+            selected_features_key = config["training"]["selected_features_key"]
+            local_selected_features_path = Path("artifacts/processors/selected_features.pkl")
+            local_selected_features_path = load_s3_file(bucket_name, selected_features_key, local_selected_features_path)
+            selected_indices = joblib.load(local_selected_features_path)
 
             X_transformed = processor.transform(features)
             X_transformed = pd.DataFrame(X_transformed)
-
             X_selected = X_transformed.iloc[:, selected_indices]
 
             logger.success("User input preprocessing completed successfully")
-
             return X_selected
 
         except Exception as e:
