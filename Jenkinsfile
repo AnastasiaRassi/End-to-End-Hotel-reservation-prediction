@@ -51,7 +51,7 @@ pipeline {
         stage('Deploy to Amazon ECS') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'jenkins_aws_usr',
+                    credentialsId: 'ECS-user',
                     usernameVariable: 'AWS_ACCESS_KEY_ID',
                     passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                 )]) {
