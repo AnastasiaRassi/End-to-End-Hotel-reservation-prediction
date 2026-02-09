@@ -58,7 +58,7 @@ pipeline {
                     script {
                         sh """
                         aws ecs update-service --cluster hotel-res-clstr \
-                            --service hotel-res-service \
+                            --service hotel-reservation-pred-task-service-c7jogp5c \
                             --force-new-deployment \
                             --region ${AWS_REGION}
                         """
