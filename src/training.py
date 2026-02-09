@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+import boto3
 
 import joblib
 import pandas as pd
@@ -21,18 +22,23 @@ from sklearn.metrics import (
 import optuna
 import mlflow
 import mlflow.sklearn
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class ModelTraining:
     def __init__(self, config):
-        self.train_config = config["training"]
-        self.proc_config = config["data_processing"]
+        self.config = config
+        self.train_config = self.config["training"]
+        self.proc_config = self.config["data_processing"]
 
         self.train_path = self.proc_config["proc_train_file"]
         self.test_path = self.proc_config["proc_test_file"]
 
-        self.model_output_dir = Path(self.train_config["model_output_path"])
-        self.model_name = "rf_01.pkl"
+        model_output_path = Path(self.train_config["model_output_path"])
+        self.model_output_dir = model_output_path.parent
+        self.model_name = model_output_path.name
 
     def _prepare_data(self):
         try:
@@ -133,6 +139,13 @@ class ModelTraining:
                 model_path = self.model_output_dir / self.model_name
                 joblib.dump(model, model_path)
                 logger.success(f"Saved trained model to {model_path}")
+
+                s3 = boto3.client("s3")
+
+                bucket_name = self.config["training"]["bucket_name"]
+                s3_key = self.config["training"]["model_key"]
+                s3.upload_file(str(model_path), bucket_name, s3_key)
+                logger.success(f"Uploaded {model_path} to s3://{bucket_name}/{s3_key}")
 
                 mlflow.sklearn.log_model(model, artifact_path="model")
 

@@ -23,15 +23,12 @@ logger.add(
 
 
 if __name__=="__main__":
-    ### 1. Data Ingestion
     config = load_config('config.yaml')
     data_ingestion = DataIngestion(config)
     data_ingestion.run()
 
-    ### 2. Data Processing
     processor = DataProcessor(config)
     processor.run()
 
-    ### 3. Model Training
     trainer = ModelTraining(config)
     trainer.run()

@@ -36,4 +36,6 @@ data_processing:
 
 training:
   model_output_path: "artifacts/models/rf_01.pkl"
-  
+  top_performer: "rf_01.pkl"
+  bucket_name: "amzn-hotel-res-bucket"
+  model_key: "artifacts/rf_01.pkl"
