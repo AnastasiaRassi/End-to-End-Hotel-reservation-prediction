@@ -1,5 +1,7 @@
 .env
 .venv
 artifacts/models/
+artifacts/processors/
+
 data/processed
 mlruns/
