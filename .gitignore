@@ -1,4 +1,5 @@
 .env
 .venv
-artifacts
+artifacts/models/
 data/processed
+mlruns/
