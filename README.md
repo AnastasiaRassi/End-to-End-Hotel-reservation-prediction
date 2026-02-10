@@ -51,7 +51,7 @@ Hotel booking cancellations cost the hospitality industry billions annually. Thi
 
 ## Demo
 
-![Hotel Reservation Prediction Demo](assets/demo.gif)
+![Hotel Reservation Prediction Demo](static/cXonJueydE.gif)
 
 *Enter booking details to receive real-time cancellation risk predictions!*
 
@@ -362,3 +362,4 @@ Contributions are welcome! Please follow these steps:
 **Note**: This project is under active development. The live demo is optimized for **desktop viewing only**.
 
 For questions, issues, or suggestions, please open an issue on GitHub.
+
