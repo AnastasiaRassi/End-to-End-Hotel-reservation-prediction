@@ -2,8 +2,6 @@
 
 A complete machine learning pipeline for predicting hotel reservation cancellations, built with modular architecture and best practices for production-ready ML systems.
 
-**Live Demo (Desktop Preferred)**: [http://alb-01-183381156.me-central-1.elb.amazonaws.com/](http://alb-01-183381156.me-central-1.elb.amazonaws.com/)
-
 ---
 
 ## Table of Contents
@@ -362,5 +360,6 @@ Contributions are welcome! Please follow these steps:
 **Note**: This project is under active development. The live demo is optimized for **desktop viewing only**.
 
 For questions, issues, or suggestions, please open an issue on GitHub.
+
 
 
